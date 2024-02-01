@@ -1,31 +1,77 @@
-resource "aws_launch_template" "my_launch_template" {
-  name = "my-launch-template"
-  description = "My Launch Template"
-  image_id = data.aws_ami.amzlinux2.id
-  instance_type = var.instance_type
+resource "aws_launch_template" "example" {
+  name = "example-template"
 
-  vpc_security_group_ids = [module.private_sg.security_group_id]
-  key_name = var.instance_keypair  
-  user_data = filebase64("${path.module}/app1-install.sh")
-  ebs_optimized = true
-  #default_version = 1
-  update_default_version = true
   block_device_mappings {
     device_name = "/dev/sda1"
     ebs {
-      volume_size = 10 
-      delete_on_termination = true
-      volume_type = "gp2" # default is gp2
-     }
+      volume_size = 20
+    }
   }
+
+  capacity_reservation_specification {
+    capacity_reservation_preference = "open"
+  }
+
+  cpu_options {
+    core_count       = 4
+    threads_per_core = 2
+  }
+
+  credit_specification {
+    cpu_credits = "standard"
+  }
+
+  disable_api_termination = true
+
+  ebs_optimized = true
+
+  elastic_gpu_specifications {
+    type = "test"
+  }
+
+  elastic_inference_accelerator {
+    type = "eia1.medium"
+  }
+
+  iam_instance_profile {
+    name = "test"
+  }
+
+  image_id = "ami-test"
+
+  instance_initiated_shutdown_behavior = "terminate"
+
+  instance_market_options {
+    market_type = "spot"
+  }
+
+  instance_type = "t2.micro"
+
+  kernel_id = "test"
+
+  key_name = "test"
+
   monitoring {
     enabled = true
   }
 
+  network_interfaces {
+    associate_public_ip_address = true
+  }
+
+  placement {
+    availability_zone = "us-west-2a"
+  }
+
+  ram_disk_id = "test"
+
+  vpc_security_group_ids = ["sg-123456"]
+
   tag_specifications {
     resource_type = "instance"
+
     tags = {
-      Name = "myasg"
+      Name = "test"
     }
   }
 }
